@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DOM & jQuery Manipulation Demo</title>
+<style>
+  /* Reset and base */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 30px 20px;
+    margin: 0;
+    background: #f0f4f8;
+    color: #333;
+  }
+  h1, h2 {
+    font-weight: 700;
+    color: #1e3a8a; /* navy blue */
+    margin-bottom: 15px;
+  }
+  #header {
+    font-size: 2.4rem;
+  }
+  .textClass {
+    margin: 12px 0;
+    color: #166534; /* dark green */
+    position: relative;
+    font-size: 1.1rem;
+  }
+  #imageContainer {
+    margin: 20px 0 30px;
+    text-align: center;
+  }
+  #imageContainer img {
+    width: 220px;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 6px 12px rgb(0 0 0 / 0.15);
+    transition: transform 0.3s ease;
+  }
+  #imageContainer img:hover {
+    transform: scale(1.05);
+  }
+  button {
+    margin: 8px 12px 25px 0;
+    padding: 12px 18px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+    color: white;
+    box-shadow: 0 4px 6px rgb(59 130 246 / 0.5);
+    cursor: pointer;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+  }
+  button:hover {
+    background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+    box-shadow: 0 6px 10px rgb(30 64 175 / 0.8);
+  }
+  button:active {
+    transform: translateY(2px);
+  }
+  #parentDiv {
+    border: 1px solid #cbd5e1;
+    background: white;
+    padding: 15px 20px;
+    min-height: 50px;
+    margin-top: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgb(203 213 225 / 0.3);
+    font-size: 1.05rem;
+    color: #334155;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid #cbd5e1;
+    margin: 40px 0 30px;
+  }
+  /* Form Styling */
+  h2 {
+    color: #1e40af;
+  }
+  form#demoForm {
+    background: white;
+    padding: 25px 30px;
+    border-radius: 12px;
+    max-width: 400px;
+    box-shadow: 0 8px 20px rgb(0 0 0 / 0.1);
+  }
+  form input {
+    display: block;
+    width: 100%;
+    padding: 12px 14px;
+    margin-bottom: 18px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.25s ease;
+  }
+  form input:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 5px #2563ebaa;
+  }
+  #submitBtn {
+    background: #2563eb;
+    color: white;
+    font-weight: 700;
+    padding: 14px;
+    border-radius: 10px;
+    border: none;
+    width: 100%;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  #submitBtn:hover {
+    background: #1e40af;
+  }
+  /* Responsive */
+  @media (max-width: 480px) {
+    body {
+      padding: 20px 15px;
+    }
+    button {
+      width: 100%;
+      margin: 8px 0 20px;
+    }
+    form#demoForm {
+      max-width: 100%;
+      padding: 20px;
+    }
+  }
+</style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+<h1 id="header">Welcome to DOM & jQuery Demo</h1>
+
+<p class="textClass">This is the first paragraph with class "textClass".</p>
+<p class="textClass">This is the second paragraph with class "textClass".</p>
+<p>This is a paragraph without any class.</p>
+
+<div id="imageContainer">
+  <img id="demoImage" src="https://via.placeholder.com/200" alt="Demo Image" />
+</div>
+
+<div>
+  <button id="btnChangeText">Change Header Text (getElementById)</button>
+  <button id="btnChangeColor">Change All Paragraph Color (getElementsByTagName)</button>
+  <button id="btnMoveElements">Move Class Elements (getElementsByClassName)</button>
+  <button id="btnChangeImage">Change Image Source</button>
+  <button id="btnAddTextNode">Add Text Node</button>
+  <button id="btnDeleteNode">Delete Text Node</button>
+</div>
+
+<div id="parentDiv" aria-live="polite">Parent Div (text nodes will be added/removed here)</div>
+
+<hr>
+
+<h2>Sample Form for jQuery Demo</h2>
+<form id="demoForm" novalidate>
+  <input type="text" name="fname" placeholder="First Name" required />
+  <input type="text" name="lname" placeholder="Last Name" required />
+  <input type="email" name="email" placeholder="Email" required />
+  <button type="submit" id="submitBtn">Submit</button>
+</form>
+
+<script>
+// Vanilla JS DOM Manipulation
+
+// 1. Change the text using getElementById and innerHTML
+document.getElementById('btnChangeText').addEventListener('click', () => {
+  document.getElementById('header').innerHTML = 'Header Text Changed by getElementById!';
+});
+
+// 2. Change color of all paragraphs using getElementsByTagName
+document.getElementById('btnChangeColor').addEventListener('click', () => {
+  const paras = document.getElementsByTagName('p');
+  for (let p of paras) {
+    p.style.color = 'crimson';
+  }
+});
+
+// 3. Move elements with class "textClass" 30px to the right using getElementsByClassName
+document.getElementById('btnMoveElements').addEventListener('click', () => {
+  const elems = document.getElementsByClassName('textClass');
+  for (let el of elems) {
+    el.style.position = 'relative';
+    el.style.left = '30px';
+  }
+});
+
+// 4. Change image source on button click
+document.getElementById('btnChangeImage').addEventListener('click', () => {
+  document.getElementById('demoImage').src = 'https://via.placeholder.com/200/ff6347/ffffff?text=New+Image';
+});
+
+// 5. Add a new text node inside #parentDiv
+document.getElementById('btnAddTextNode').addEventListener('click', () => {
+  const parent = document.getElementById('parentDiv');
+  const newText = document.createTextNode('This is a new text node added. ');
+  parent.appendChild(newText);
+});
+
+// 6. Delete the first child text node of #parentDiv (if exists)
+document.getElementById('btnDeleteNode').addEventListener('click', () => {
+  const parent = document.getElementById('parentDiv');
+  if (parent.firstChild) {
+    parent.removeChild(parent.firstChild);
+  } else {
+    alert('No child node to delete.');
+  }
+});
+
+// jQuery operations
+$(document).ready(function () {
+
+  // Change button text using jQuery
+  $('#btnChangeText').click(function () {
+    $(this).text('Button Text Changed by jQuery');
+  });
+
+  // Set background-image using jQuery CSS property
+  $('#btnChangeColor').click(function () {
+    $('body').css({
+      'background-image': 'url(https://via.placeholder.com/1200x600/87CEEB/000000?text=Background)',
+      'background-repeat': 'no-repeat',
+      'background-size': 'cover'
+    });
+  });
+
+  // Access HTML form data using jQuery and alert it on submit
+  $('#demoForm').submit(function (event) {
+    event.preventDefault(); // prevent actual form submission
+    let formData = $(this).serializeArray();
+    let message = 'Form Data:\n';
+    formData.forEach(function (field) {
+      message += field.name + ': ' + field.value + '\n';
+    });
+    alert(message);
+  });
+
+  // Add attribute (placeholder) using jQuery to email input (already present in HTML, but kept here for demo)
+  $('input[type="email"]').attr('placeholder', 'Enter your email here');
+});
+</script>
+
+</body>
+</html>

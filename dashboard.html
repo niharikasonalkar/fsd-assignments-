@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dynamic User Dashboard</title>
+
+  <style>
+    /* ===== GLOBAL STYLES ===== */
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #F8C8DC;
+      color: #111827;
+    }
+
+    .navbar {
+      background-color: #ADD8E6;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      padding: 15px;
+    }
+
+    .navbar button {
+      background: transparent;
+      color: black;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 8px 12px;
+      border-bottom: 2px solid transparent;
+      transition: 0.3s;
+    }
+
+    .navbar button.active {
+      border-bottom: 2px solid #3b82f6;
+    }
+
+    .content {
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    /* ===== LISTS ===== */
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    li {
+      background: #e5e7eb;
+      margin: 5px 0;
+      padding: 10px;
+      border-radius: 6px;
+    }
+
+    /* ===== MODAL ===== */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal {
+      background: white;
+      padding: 25px;
+      border-radius: 8px;
+      width: 300px;
+      text-align: center;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .navbar {
+        flex-direction: column;
+      }
+
+      .navbar button {
+        font-size: 14px;
+      }
+
+      .content {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ===== NAVIGATION BAR ===== -->
+  <div class="navbar">
+    <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+    <button class="tab-btn" data-tab="profile">Profile</button>
+    <button class="tab-btn" data-tab="settings">Settings</button>
+    <button class="tab-btn" data-tab="notifications">Notifications</button>
+  </div>
+
+  <!-- ===== MAIN CONTENT AREA ===== -->
+  <div class="content" id="content-area">
+    <!-- Default tab loaded here -->
+  </div>
+
+  <!-- ===== MODAL (PORTAL-LIKE) ===== -->
+  <div id="modal-root"></div>
+
+  <script>
+    // ===== USER DATA (DYNAMIC LIST) =====
+    const users = [
+      { id: 1, name: "Niharika Sonalkar", role: "Admin" },
+      { id: 2, name: "Meghshyam Patil", role: "Editor" },
+      { id: 3, name: "Khushi Patankar", role: "Viewer" },
+    ];
+
+    // ===== TEMPLATES FOR TABS =====
+    const templates = {
+      dashboard: `
+        <h2>📊 User Dashboard</h2>
+        <p>Welcome to your dashboard! Here's a list of users:</p>
+        <ul>
+          ${users
+            .map(
+              (u) => `<li><strong>${u.name}</strong> — ${u.role}</li>`
+            )
+            .join("")}
+        </ul>
+      `,
+
+      profile: `
+        <h2>👤 Profile</h2>
+        <p><strong>Name:</strong> Niharika Sonalkar</p>
+        <p><strong>Email:</strong> niharika.sonalkar@mitwpu.edu.in</p>
+        <p><strong>Role:</strong> Admin</p>
+      `,
+
+      settings: `
+        <h2>⚙️ Settings</h2>
+        <p>Manage your preferences below:</p>
+        <button id="openModalBtn">Open Preferences Modal</button>
+      `,
+
+      notifications: `
+        <h2>🔔 Notifications</h2>
+        <ul>
+          <li>You have 3 new messages.</li>
+          <li>Update your server.</li>
+          <li>OTP for login is ****.</li>
+        </ul>
+      `,
+    };
+
+    // ===== INITIAL LOAD =====
+    const contentArea = document.getElementById("content-area");
+    contentArea.innerHTML = templates.dashboard;
+
+    // ===== TAB NAVIGATION =====
+    const buttons = document.querySelectorAll(".tab-btn");
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        buttons.forEach((b) => b.classList.remove("active"));
+        e.target.classList.add("active");
+        const tab = e.target.getAttribute("data-tab");
+
+        try {
+          // Simulate error handling
+          if (!templates[tab]) throw new Error("Page not found!");
+          contentArea.innerHTML = templates[tab];
+          attachModalHandler();
+        } catch (error) {
+          contentArea.innerHTML = `<h2 style="color:red;">Error: ${error.message}</h2>`;
+        }
+      });
+    });
+
+    // ===== MODAL PORTAL SIMULATION =====
+    function attachModalHandler() {
+      const openModalBtn = document.getElementById("openModalBtn");
+      if (!openModalBtn) return;
+
+      openModalBtn.addEventListener("click", () => {
+        const modalRoot = document.getElementById("modal-root");
+        modalRoot.innerHTML = `
+          <div class="modal-overlay">
+            <div class="modal">
+              <h3>Preferences</h3>
+              <p>Change your settings here.</p>
+              <button id="closeModalBtn">Close</button>
+            </div>
+          </div>
+        `;
+
+        document.getElementById("closeModalBtn").addEventListener("click", () => {
+          modalRoot.innerHTML = "";
+        });
+      });
+    }
+
+    // Attach once on load
+    attachModalHandler();
+  </script>
+</body>
+</html>
